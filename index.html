@@ -1,0 +1,36 @@
+<html>
+<head>
+<title>Kirby Pong</title>
+<script src="embedskulptor.js"></script>
+</head>
+<body>
+<script>
+(function() {
+var options = {
+	"gui": {
+		"show": true
+	},
+	"console": {
+		"show": false
+	},
+	"code": {
+		"load_from_url": "kirby_pong.py",
+		"show": false
+	}
+};
+
+embedSkulptor(options,(function () {/*
+################################
+# PASTE YOUR PYTHON CODE BELOW #
+################################
+
+
+
+################################
+# PASTE YOUR PYTHON CODE ABOVE #
+################################
+*/}).toString().match(/[^]*\/\*([^]*)\*\/\}$/)[1]);
+})();
+</script>
+
+</body>
