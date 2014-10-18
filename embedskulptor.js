@@ -140,7 +140,7 @@ function initOptions(options) {
 	}
 	
 	// load python code from url when specified
-	if (options.code && options.code.load_from_url.length > 0) {
+	if (options.code && options.code.load_from_url && options.code.load_from_url.length > 0) {
 		loadPythonFromURL(options.code.load_from_url);
 	}
 }
