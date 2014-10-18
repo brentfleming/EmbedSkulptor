@@ -1,0 +1,22 @@
+CodeSkulptor is an awesome online tool built by Scott Rixner for teaching a Python course at Rice university.
+You can easily write and debug Python code on codeskulptor.org but trying to share your games with friends and family members can sometimes be a little painful.  (finding and clicking the run button in the upper left hand corner is a barrier to entry for my mom at least)
+
+This is why I built EmbedSkulptor.  embedskulptor.js makes it easy to put your python programs built using codeskulptor on your own website (simplegui and all).
+
+Here is a working demo of the included simplegui Hello World found in index.html:
+
+http://davealger.com/apps/embedskulptor/
+
+As you can see there are 3 embedded components:
+(1) code - this is invisible by default but when shown you can paste your code from codeskulptor.org here and it will run as soon as you click outside of the component
+(2) gui - this is the frame created by simplegui.create_frame and is visible by default
+(3) console - this is where print statements and other console output goes and is invisible by default
+
+Only the gui is shown by default because the main use case I wanted to cover was someone clicking on a link and my simplegui python game would just start playing like the following stopwatch sample...
+
+http://davealger.com/stopwatch/
+
+Until I can come up with better documentation you'll need to look at the index.html file included with EmbedSkulptor to see how it works.
+
+Thanks for playing with me,
+run-time
