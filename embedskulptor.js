@@ -57,6 +57,18 @@ function initOptions(options) {
 	};
 
 	// override visibility
+	
+	// only show gui if nothing passed in
+	if (!options.code) {
+		options.code = {"show": false};
+	}
+	if (!options.gui) {
+		options.gui = {"show": true};
+	}
+	if (!options.console) {
+		options.console = {"show": false};
+	}
+	
 	if (options.code && options.code.show) {
 		embedskulptor_options.code.hide = "";
 	}
@@ -99,6 +111,7 @@ function initOptions(options) {
 	}
 	
 	// calculate component sizes
+	
 	var component_width = parseInt(win_w() / visible) - margin_offset;
 	var component_height = parseInt(win_h()) - 2;
 	
@@ -136,7 +149,7 @@ function initOptions(options) {
 		embedskulptor_options.console.hide = "";
 		embedskulptor_options.console.width = component_width;
 		embedskulptor_options.console.height = component_height;
-		(options.console.css) ? embedskulptor_options.console.css = options.console.css : embedskulptor_options.console.css = "embedskulptor-console-class";
+		embedskulptor_options.console.css = "embedskulptor-console-class";
 	}
 	
 	// load python code from url when specified
