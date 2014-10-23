@@ -1,8 +1,26 @@
 var embedskulptor_options = {};
+var user_options = {};
 
 function embedSkulptor(options, code) {
 	// place dynamic elements
-	initOptions( options );
+	if (options && !isEmpty(options)) {
+		user_options = options;
+	}
+	else {
+		user_options = {
+			"code": {
+				"show": false
+			},
+			"gui": {
+				"show": true
+			},
+			"console": {
+				"show": false
+			}
+		}
+	}
+
+	initOptions();
 	document.write( generateCSS() );
 	embedSkulptorInit();
 
@@ -45,7 +63,7 @@ function embedSkulptorExecute() {
 	eval( Sk.importMainWithBody( "<stdin>", false, python_code ) );
 }
 
-function initOptions(options) {
+function initOptions() {
 	var options_code = {"css": "embedskulptor-code-class", "hide": ""};
 	var options_gui = {"css": "embedskulptor-gui-class", "hide": ""};
 	var options_console = {"css": "embedskulptor-console-class", "hide": ""};
@@ -56,7 +74,7 @@ function initOptions(options) {
 		"console": options_console
 	};
 
-	// override visibility
+	var options = user_options;
 
 	// only show gui if nothing passed in
 	if (!options.code) {
@@ -144,6 +162,15 @@ function skulpt_out(text) {
    mypre.innerHTML = mypre.innerHTML + text;
 }
 
+function isEmpty(obj) {
+    for(var prop in obj) {
+        if(obj.hasOwnProperty(prop))
+            return false;
+    }
+
+    return true;
+}
+
 function win_w() {
 	var w = window.innerWidth||document.documentElement.clientWidth||document.body.clientWidth||0;
 	return w;
@@ -179,7 +206,7 @@ function updateWidths(options) {
 	var component_height = parseInt(win_h()) - 2;
 
 	// override width, height, and css class when specified
-	if (options && options.code) {
+	if (options.code) {
 		(options.code.width) ? embedskulptor_options.code.width = options.code.width : embedskulptor_options.code.width = component_width;
 		(options.code.height) ? embedskulptor_options.code.height = options.code.height : embedskulptor_options.code.height = component_height;
 		(options.code.css) ? embedskulptor_options.code.css = options.code.css : embedskulptor_options.code.css = "embedskulptor-code-class";
@@ -191,7 +218,7 @@ function updateWidths(options) {
 		embedskulptor_options.code.css = "embedskulptor-code-class";
 	}
 
-	if (options && options.gui) {
+	if (options.gui) {
 		(options.gui.width) ? embedskulptor_options.gui.width = options.gui.width : embedskulptor_options.gui.width = component_width;
 		(options.gui.height) ? embedskulptor_options.gui.height = options.gui.height : embedskulptor_options.gui.height = component_height;
 		(options.gui.css) ? embedskulptor_options.gui.css = options.gui.css : embedskulptor_options.gui.css = "embedskulptor-gui-class";
@@ -203,7 +230,7 @@ function updateWidths(options) {
 		embedskulptor_options.gui.css = "embedskulptor-gui-class";
 	}
 
-	if (options && options.console) {
+	if (options.console) {
 		(options.console.width) ? embedskulptor_options.console.width = options.console.width : embedskulptor_options.console.width = component_width;
 		(options.console.height) ? embedskulptor_options.console.height = options.console.height : embedskulptor_options.console.height = component_height;
 		(options.console.css) ? embedskulptor_options.console.css = options.console.css : embedskulptor_options.console.css = "embedskulptor-console-class";
@@ -216,7 +243,7 @@ function updateWidths(options) {
 	}
 
 	window.onresize = function(event) {
-		updateWidths(false);
+		updateWidths(user_options);
 		document.getElementById("embedskulptor_css").innerHTML = getStyles();
 	};
 }
