@@ -5,27 +5,27 @@ function embedSkulptor(options, code) {
 	initOptions( options );
 	document.write( generateCSS() );
 	embedSkulptorInit();
-	
+
 	// event handler for editing code
 	var area = document.getElementById("embedskulptor_code");
 	area.value = code;
-	
+
 	if (area.addEventListener) {
 		area.addEventListener("blur", function() {
 			embedSkulptorExecute();
 		}, false);
-	} 
+	}
 	else if (area.attachEvent) {
 		area.attachEvent("blur", function() {
 			embedSkulptorExecute();
 		});
 	}
-	
+
 	// load python script from url if given
 	if (embedskulptor_options.code.load_from_url > 0) {
 		loadPythonFromURL(embedskulptor_options.code.load_from_url);
 	}
-	
+
 	// auto-run
 	embedSkulptorExecute();
 }
@@ -57,7 +57,7 @@ function initOptions(options) {
 	};
 
 	// override visibility
-	
+
 	// only show gui if nothing passed in
 	if (!options.code) {
 		options.code = {"show": false};
@@ -68,90 +68,31 @@ function initOptions(options) {
 	if (!options.console) {
 		options.console = {"show": false};
 	}
-	
+
 	if (options.code && options.code.show) {
 		embedskulptor_options.code.hide = "";
 	}
 	else {
 		embedskulptor_options.code.hide = "display:none;";
 	}
-	
+
 	if (options.gui && options.gui.show) {
 		embedskulptor_options.gui.hide = "";
 	}
 	else {
 		embedskulptor_options.gui.hide = "display:none;";
 	}
-	
+
 	if (options.console && options.console.show) {
 		embedskulptor_options.console.hide = "";
 	}
 	else {
 		embedskulptor_options.console.hide = "display:none;";
 	}
-	
-	// count visible components
-	var visible = 0;
-	var margin_offset = 0;
-	if (embedskulptor_options.gui.hide == "") {
-		visible += 1;
-	}
-	if (embedskulptor_options.console.hide == "") {
-		visible += 1;
-	}
-	if (embedskulptor_options.code.hide == "") {
-		visible += 1;
-	}
-	
-	if (visible == 1) {
-		margin_offset = 2;
-	}
-	else {
-		margin_offset = 10;
-	}
-	
+
 	// calculate component sizes
-	
-	var component_width = parseInt(win_w() / visible) - margin_offset;
-	var component_height = parseInt(win_h()) - 2;
-	
-	// override width, height, and css class when specified
-	if (options.code) {
-		(options.code.width) ? embedskulptor_options.code.width = options.code.width : embedskulptor_options.code.width = component_width;
-		(options.code.height) ? embedskulptor_options.code.height = options.code.height : embedskulptor_options.code.height = component_height;
-		(options.code.css) ? embedskulptor_options.code.css = options.code.css : embedskulptor_options.code.css = "embedskulptor-code-class";
-	}
-	else {
-		embedskulptor_options.code.hide = "display:none;";
-		embedskulptor_options.code.width = component_width;
-		embedskulptor_options.code.height = component_height;
-		embedskulptor_options.code.css = "embedskulptor-code-class";
-	}
-	
-	if (options.gui) {
-		(options.gui.width) ? embedskulptor_options.gui.width = options.gui.width : embedskulptor_options.gui.width = component_width;
-		(options.gui.height) ? embedskulptor_options.gui.height = options.gui.height : embedskulptor_options.gui.height = component_height;
-		(options.gui.css) ? embedskulptor_options.gui.css = options.gui.css : embedskulptor_options.gui.css = "embedskulptor-gui-class";
-	}
-	else {
-		embedskulptor_options.gui.hide = "";
-		embedskulptor_options.gui.width = component_width;
-		embedskulptor_options.gui.height = component_height;
-		embedskulptor_options.gui.css = "embedskulptor-gui-class";
-	}
-	
-	if (options.console) {
-		(options.console.width) ? embedskulptor_options.console.width = options.console.width : embedskulptor_options.console.width = component_width;
-		(options.console.height) ? embedskulptor_options.console.height = options.console.height : embedskulptor_options.console.height = component_height;
-		(options.console.css) ? embedskulptor_options.console.css = options.console.css : embedskulptor_options.console.css = "embedskulptor-console-class";
-	}
-	else {
-		embedskulptor_options.console.hide = "";
-		embedskulptor_options.console.width = component_width;
-		embedskulptor_options.console.height = component_height;
-		embedskulptor_options.console.css = "embedskulptor-console-class";
-	}
-	
+	updateWidths(options);
+
 	// load python code from url when specified
 	if (options.code && options.code.load_from_url && options.code.load_from_url.length > 0) {
 		loadPythonFromURL(options.code.load_from_url);
@@ -159,10 +100,18 @@ function initOptions(options) {
 }
 
 
-function generateCSS() {	
+function generateCSS() {
 	var css = "";
-	
-	css = "<style>";
+
+	css = '<style id="embedskulptor_css">';
+	css += getStyles();
+	css += '</style>';
+
+	return css;
+}
+
+function getStyles() {
+	var css = "";
 	css += "body{margin:0;padding:0;}";
 	css += ".embedskulptor-frame{display:inline-block;vertical-align:top;}";
 	css += ".embedskulptor-gui-class{border: 1px solid #cccccc;background: #f0f0f0;}";
@@ -171,8 +120,6 @@ function generateCSS() {
 	css += "#embedskulptor_gui_frame{"+embedskulptor_options.gui.hide+"}#embedskulptor_gui{border:0;width:"+(embedskulptor_options.gui.width)+"px;height:"+(embedskulptor_options.gui.height)+"px;"+embedskulptor_options.gui.hide+"}";
 	css += "#embedskulptor_console_frame{"+embedskulptor_options.console.hide+"}#embedskulptor_console{margin:0;overflow:scroll;width:"+(embedskulptor_options.console.width)+"px;height:"+(embedskulptor_options.console.height)+"px;"+embedskulptor_options.console.hide+"}";
 	css += "#embedskulptor_code_frame{"+embedskulptor_options.code.hide+"}#embedskulptor_code{width:"+(embedskulptor_options.code.width)+"px;height:"+(embedskulptor_options.code.height)+"px;"+embedskulptor_options.code.hide+"}";
-	css += "</style>";
-	
 	return css;
 }
 
@@ -197,22 +144,100 @@ function skulpt_out(text) {
    mypre.innerHTML = mypre.innerHTML + text;
 }
 
-function win_w(){
+function win_w() {
 	var w = window.innerWidth||document.documentElement.clientWidth||document.body.clientWidth||0;
 	return w;
 }
 
-function win_h(){
+function win_h() {
 	var h = window.innerHeight||document.documentElement.clientHeight||document.body.clientHeight||0;
 	return h;
+}
+
+function updateWidths(options) {
+	// count visible components
+	var visible = 0;
+	if (embedskulptor_options.gui.hide == "") {
+		visible += 1;
+	}
+	if (embedskulptor_options.console.hide == "") {
+		visible += 1;
+	}
+	if (embedskulptor_options.code.hide == "") {
+		visible += 1;
+	}
+
+	var margin_offset = 0;
+	if (visible == 1) {
+		margin_offset = 2;
+	}
+	else {
+		margin_offset = 10;
+	}
+
+	var component_width = parseInt(win_w() / visible) - margin_offset;
+	var component_height = parseInt(win_h()) - 2;
+
+	// override width, height, and css class when specified
+	if (options && options.code) {
+		(options.code.width) ? embedskulptor_options.code.width = options.code.width : embedskulptor_options.code.width = component_width;
+		(options.code.height) ? embedskulptor_options.code.height = options.code.height : embedskulptor_options.code.height = component_height;
+		(options.code.css) ? embedskulptor_options.code.css = options.code.css : embedskulptor_options.code.css = "embedskulptor-code-class";
+	}
+	else {
+		embedskulptor_options.code.hide = "";
+		embedskulptor_options.code.width = component_width;
+		embedskulptor_options.code.height = component_height;
+		embedskulptor_options.code.css = "embedskulptor-code-class";
+	}
+
+	if (options && options.gui) {
+		(options.gui.width) ? embedskulptor_options.gui.width = options.gui.width : embedskulptor_options.gui.width = component_width;
+		(options.gui.height) ? embedskulptor_options.gui.height = options.gui.height : embedskulptor_options.gui.height = component_height;
+		(options.gui.css) ? embedskulptor_options.gui.css = options.gui.css : embedskulptor_options.gui.css = "embedskulptor-gui-class";
+	}
+	else {
+		embedskulptor_options.gui.hide = "";
+		embedskulptor_options.gui.width = component_width;
+		embedskulptor_options.gui.height = component_height;
+		embedskulptor_options.gui.css = "embedskulptor-gui-class";
+	}
+
+	if (options && options.console) {
+		(options.console.width) ? embedskulptor_options.console.width = options.console.width : embedskulptor_options.console.width = component_width;
+		(options.console.height) ? embedskulptor_options.console.height = options.console.height : embedskulptor_options.console.height = component_height;
+		(options.console.css) ? embedskulptor_options.console.css = options.console.css : embedskulptor_options.console.css = "embedskulptor-console-class";
+	}
+	else {
+		embedskulptor_options.console.hide = "";
+		embedskulptor_options.console.width = component_width;
+		embedskulptor_options.console.height = component_height;
+		embedskulptor_options.console.css = "embedskulptor-console-class";
+	}
+
+	window.onresize = function(event) {
+		updateWidths(false);
+		document.getElementById("embedskulptor_css").innerHTML = getStyles();
+	};
 }
 
 
 
 
-/***
-DO NOT CHANGE CODE BELOW THIS LINE ----------------------------------------------------------------------------------------------------
-***/
+
+/*
+Custom Skulpt Implementation Below:
+http://www.skulpt.org/
+
+
+Includes custom skulpt import modules created by Scott Rixner at RICE University
+for teaching an online python programming class on Coursera:
+https://class.coursera.org/interactivepython-005
+
+--------------------------------------------------------------------------------
+DO NOT CHANGE CODE BELOW THIS LINE
+--------------------------------------------------------------------------------
+*/
 (function(){var COMPILED=!0,goog=goog||{};goog.global=this;goog.exportPath_=function(a,b,c){a=a.split(".");c=c||goog.global;a[0]in c||!c.execScript||c.execScript("var "+a[0]);for(var d;a.length&&(d=a.shift());)a.length||void 0===b?c=c[d]?c[d]:c[d]={}:c[d]=b};goog.define=function(a,b){var c=b;COMPILED||goog.global.CLOSURE_DEFINES&&Object.prototype.hasOwnProperty.call(goog.global.CLOSURE_DEFINES,a)&&(c=goog.global.CLOSURE_DEFINES[a]);goog.exportPath_(a,c)};goog.DEBUG=!1;goog.LOCALE="en";goog.TRUSTED_SITE=!0;
 goog.provide=function(a){if(!COMPILED){if(goog.isProvided_(a))throw Error('Namespace "'+a+'" already declared.');delete goog.implicitNamespaces_[a];for(var b=a;(b=b.substring(0,b.lastIndexOf(".")))&&!goog.getObjectByName(b);)goog.implicitNamespaces_[b]=!0}goog.exportPath_(a)};goog.setTestOnly=function(a){if(COMPILED&&!goog.DEBUG)throw a=a||"",Error("Importing test-only code into non-debug environment"+a?": "+a:".");};
 COMPILED||(goog.isProvided_=function(a){return!goog.implicitNamespaces_[a]&&!!goog.getObjectByName(a)},goog.implicitNamespaces_={});goog.getObjectByName=function(a,b){for(var c=a.split("."),d=b||goog.global,e;e=c.shift();)if(goog.isDefAndNotNull(d[e]))d=d[e];else return null;return d};goog.globalize=function(a,b){var c=b||goog.global,d;for(d in a)c[d]=a[d]};
